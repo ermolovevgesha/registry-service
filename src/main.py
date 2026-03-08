@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from core.config import settings
+from api.v1.routes import messages_router
 
 
 @asynccontextmanager
@@ -12,6 +13,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan, title="Registry API")
+
+app.include_router(messages_router)
+
 
 @app.get('/api/health')
 def health_check():
