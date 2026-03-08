@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from core.config import settings
-from api.v1.routes import messages_router
+from src.core.config import settings
+from src.api.v1.routes import messages_router
 
 
 @asynccontextmanager
