@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from src.core.config import settings
 from src.db.database import Base
+from src.core.config import settings
 from src.db.models import TransactionModel
 
 
