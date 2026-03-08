@@ -6,7 +6,6 @@ from pydantic import (
     AnyUrl,
     BeforeValidator,
     PostgresDsn,
-    RedisDsn,
     computed_field,
 )
 
