@@ -11,7 +11,11 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, title="Registry API")
+
+@app.get('/api/health')
+def health_check():
+    return "OK"
 
 
 if __name__ == '__main__':
