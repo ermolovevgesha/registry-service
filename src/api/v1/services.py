@@ -1,12 +1,11 @@
-from datetime import datetime
-
-from src.core.utils import pydantic_to_base64, encode64, get_hash
+from datetime import datetime, timezone
 
 from src.db.test_data import get_outgoing_test_data
 from src.db.repositories import TransactionRepository
 from src.schemas.search import SearchParamsSchema
 from src.schemas.transaction import Transaction, TransactionValid
 from src.schemas.message import Message, MessageData202, MessageData203, MessageData215
+from src.core.utils import pydantic_to_base64, encode64, get_hash, get_transaction_sign_from_hash
 
 
 class TransactionService():
@@ -55,23 +54,23 @@ class TransactionService():
                 SenderBranch='SYSTEM_B', 
                 ReceiverBranch='SYSTEM_A', 
                 ChainGuid=message.ChainGuid, 
-                MessageTime=datetime.now()
+                MessageTime=datetime.now(timezone.utc)
             )
             new_transaction = Transaction(
                 TransactionType=9,
                 Data=pydantic_to_base64(receipt_message),
                 Hash='',
                 Sign='',
-                TransactionTime=datetime.now(),
+                TransactionTime=datetime.now(timezone.utc),
                 SignerCert=encode64(b'SYSTEM_B_CERT'),
                 Metadata=None,
                 TransactionIn=None,
                 TransactionOut=None
             )
             
-            new_transaction_hash = get_hash(new_transaction.model_dump_json().encode())
+            new_transaction_hash = get_hash(new_transaction.model_dump_json(exclude={'Hash', 'Sign'}).encode())
             new_transaction.Hash, new_transaction.Sign = new_transaction_hash, encode64(new_transaction_hash.encode())
-            
+            new_transaction.Sign = get_transaction_sign_from_hash(new_transaction_hash)
             receipt_transactions.append(new_transaction)
 
         await self.transactions_repo.commit()

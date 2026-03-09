@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from src.schemas.transaction import Transaction
 from src.core.utils import encode64, get_hash
 
@@ -82,7 +82,7 @@ def get_outgoing_test_data() -> Transaction:
         Hash=sample_hash,
         Sign=sample_sign,
         SignerCert=encode64(b"SYSTEM_B"),
-        TransactionTime=datetime.now(),
+        TransactionTime=datetime.now(timezone.utc),
         Metadata="SYSTEM_A",
     )
     
