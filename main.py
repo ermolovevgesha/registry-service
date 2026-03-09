@@ -5,10 +5,13 @@ from fastapi import FastAPI
 
 from src.core.config import settings
 from src.api.v1.routes import messages_router
+from src.api.v1.deps import TransactionServiceDep
+from src.db.init_db import init_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await init_db()
     yield
 
 

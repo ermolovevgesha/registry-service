@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     APP_PORT: int = 8000
     APP_HOST: str = '0.0.0.0'
-    APP_DEBUG_MODE: bool = True
+    APP_DEBUG_MODE: bool = False
   
     DATABASE_URL: str = "sqlite+aiosqlite:///./registry.db"
     

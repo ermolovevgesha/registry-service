@@ -1,34 +1,10 @@
 from typing import Optional
-from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, Base64Str
 
 
 class SignedApiData(BaseModel):
-    Data: str
+    Data: Base64Str = 'eyJTdGFydERhdGUiOiAiMjAyNC0wMS0wMVQwMDowMDowMFoiLCAiRW5kRGF0ZSI6ICIyMDI2LTEyLTMxVDIzOjU5OjU5WiIsICJMaW1pdCI6IDEwLCAiT2Zmc2V0IjogMH0='
     Sign: Optional[str] = None
     SignerCert: Optional[str] = None
-    
-class SearchRequest(BaseModel):
-    StartDate: datetime
-    EndDate: datetime
-    Limit: int
-    Offset: int
-    
-class Transaction(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    TransactionType: int
-    Data: str
-    Hash: str
-    Sign: str
-    SignerCert: str
-    TransactionTime: datetime
-    Metadata: Optional[str]
-    TransactionIn: Optional[str]
-    TransactionOut: Optional[str]
-    
-class TransactionsData(BaseModel):
-    Transactions: list[Transaction]
-    Count: int
     

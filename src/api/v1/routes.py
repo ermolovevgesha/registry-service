@@ -1,27 +1,35 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, HTTPException
 
-from src.api.v1.deps import SessionDep
-from src.api.v1.schemas import SignedApiData, SearchRequest, Transaction, TransactionsData
-from src.api.v1.services import APIService
-from src.core.utils import decode, encode
-
-from src.core.test_data import init_outgoing_test_data
+from src.core.utils import pydantic_to_base64
+from src.api.v1.deps import TransactionServiceDep
+from src.schemas.search import SearchParamsSchema
+from src.schemas.transaction import TransactionsData
+from src.api.v1.schemas import SignedApiData
 
 
 messages_router = APIRouter(prefix='/api/messages', tags=['messages'])
 
-service = APIService()
-
 
 @messages_router.post('/outgoing', response_model=SignedApiData)
-async def outgoing(data: SignedApiData, session: SessionDep):
-    decoded_data = SearchRequest.model_validate_json(decode(data.Data))
+async def outgoing(data: SignedApiData, service: TransactionServiceDep):
     
-    db_transactions = await service.search_transactions(decoded_data.StartDate, decoded_data.EndDate, decoded_data.Limit, decoded_data.Offset, session)
+    transactions = await service.search_transactions(SearchParamsSchema.model_validate_json(data.Data))
 
-    transactions_list = [Transaction.model_validate(t) for t in db_transactions]
+    response_data = TransactionsData(Transactions=transactions, Count=len(transactions))
+
+    return SignedApiData(Data=pydantic_to_base64(response_data))
+
+
+@messages_router.post('/incoming')
+async def incoming(data: SignedApiData, service: TransactionServiceDep):
+    try:
+        transactions = TransactionsData.model_validate_json(data.Data)
+    except ValueError as e:
+        return HTTPException(status_code=400, detail=str(e))
     
-    trans_data = TransactionsData(Transactions=transactions_list, Count=len(transactions_list))
-    
-    return SignedApiData(Data=encode(trans_data.model_dump_json().encode()))
+    receipt_transactions = await service.save_transactions(transactions.Transactions)
+        
+    response_data = TransactionsData(Transactions=receipt_transactions, Count=len(receipt_transactions))
+    return SignedApiData(Data=pydantic_to_base64(response_data))
+
 
