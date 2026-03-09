@@ -5,7 +5,6 @@ from fastapi import FastAPI
 
 from src.core.config import settings
 from src.api.v1.routes import messages_router
-from src.api.v1.deps import TransactionServiceDep
 from src.db.init_db import init_db
 
 
@@ -27,3 +26,4 @@ def health_check():
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host=settings.APP_HOST, port=settings.APP_PORT, reload=settings.APP_DEBUG_MODE)
+
