@@ -15,3 +15,4 @@ async def init_db():
         trans_repo = TransactionRepository(session)
         await trans_repo.save(get_outgoing_test_data())
         await trans_repo.commit()
+        

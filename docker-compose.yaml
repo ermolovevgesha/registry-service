@@ -10,9 +10,6 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     ports:
       - "8000:8000"
-    volumes:
-      - ./src:/app/src
-      
     command: uv run main.py
 
 
